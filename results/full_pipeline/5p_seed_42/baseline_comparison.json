@@ -1,0 +1,19 @@
+{
+  "injection_percent": 5.0,
+  "metric": "ROC-AUC",
+  "setting": "random_to_random",
+  "reference": "TGF paper Table III",
+  "values": {
+    "H1000": {
+      "paper_roc_auc": 0.9635,
+      "run_roc_auc": 0.9668316668738145,
+      "difference": 0.003331666873814476
+    },
+    "combined_H": {
+      "paper_roc_auc": 0.9876,
+      "run_roc_auc": 0.9869134815728715,
+      "difference": -0.0006865184271285241
+    }
+  },
+  "caveat": "The generated injection realization and local dataset version may differ from the paper."
+}
