@@ -1,9 +1,15 @@
 # Results
 
-Tracked `metrics_*.csv` and `seed_*/` files are earlier preliminary runs. The
-current staged pipeline writes new outputs under a run-specific directory, for
-example `results/full_pipeline/seed_42/`. Generated streams, extracted feature
-tables, and optional baseline comparisons are ignored by Git because they can
-be regenerated from the recorded run configuration.
+The `full_pipeline/` directory contains complete seed-42 runs at 1%, 5%, and
+10% injection. Each run includes both injected streams, H1000 and combined-H
+feature tables, per-setting and combined metrics, a run configuration,
+`summary.json`, and a readable `REPORT.md`.
 
-Commands and output definitions are in [PIPELINE.md](../PIPELINE.md).
+All three manifests record the same input dataset SHA-256, pinned TGF commit,
+injection settings, and random seeds. The project code revision and source hashes
+are recorded with the run metadata. The metric CSVs contain PR-AUC, ROC-AUC,
+recall at 1% FPR, actual FPR, sample counts, and feature counts.
+
+See [PIPELINE.md](../PIPELINE.md) for reproduction and optional paper-comparison
+commands. These results use one seed and are preliminary pending repeated-seed
+analysis and generator diagnostics.

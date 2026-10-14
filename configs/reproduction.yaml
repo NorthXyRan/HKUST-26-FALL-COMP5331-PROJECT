@@ -1,5 +1,5 @@
 # Staged UCI Messages experiment. CLI flags can override these values.
-dataset: TGF/1-PreprocessingOfDatasets/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt
+dataset: data/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt
 official_tgf_commit: af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b
 injection:
   anomaly_percent_of_original_events: 5

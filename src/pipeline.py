@@ -20,7 +20,7 @@ from .injection import (
 )
 from .modeling import fit_and_score
 
-DEFAULT_DATA = PROJECT / "TGF/1-PreprocessingOfDatasets/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt"
+DEFAULT_DATA = PROJECT / "data/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt"
 FEATURE_CONFIGURATIONS = {
     "H1000": (1000,),
     "combined_H": DEFAULT_HORIZONS,

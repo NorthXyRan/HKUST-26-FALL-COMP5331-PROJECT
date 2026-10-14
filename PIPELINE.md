@@ -130,3 +130,26 @@ sample match.
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## Recreate the checked-in 1%, 5%, and 10% results
+
+The checked-in runs use seed 42 and have directories `1p_seed_42`,
+`5p_seed_42`, and `10p_seed_42`. To regenerate each complete run and its separate
+paper comparison:
+
+```bash
+for PCT in 1 5 10; do
+  RUN_DIR="results/full_pipeline/${PCT}p_seed_42"
+  python -m src.pipeline inject \
+    --data data/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt \
+    --seed 42 --anomaly-percent "$PCT" --output "$RUN_DIR"
+  python -m src.pipeline extract --run-dir "$RUN_DIR" --feature-set all
+  python -m src.pipeline evaluate --run-dir "$RUN_DIR" --train-fraction 0.70
+  python -m src.baseline_comparison --run-dir "$RUN_DIR"
+done
+```
+
+All files needed to inspect the current runs are checked in under
+`results/full_pipeline/`. `results/code_snapshot.json` and each run manifest
+record the project revision and source-file SHA-256 values used for these runs,
+the dataset hash, and the pinned upstream TGF commit.
