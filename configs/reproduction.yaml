@@ -1,0 +1,26 @@
+# Staged UCI Messages experiment. CLI flags can override these values.
+dataset: TGF/1-PreprocessingOfDatasets/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt
+official_tgf_commit: af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b
+injection:
+  anomaly_percent_of_original_events: 5
+  seed: 42
+  timestamp_sampling: with_replacement
+  shared_timestamps_between_generators: true
+  activity_window_events: 100
+  activity_quantile_bins: 10
+  history_visibility: timestamp_strictly_less_than_event_time
+features:
+  label_horizon: 5
+  H1000: [1000]
+  combined_H: [5, 50, 100, 1000, 10000, 15000]
+evaluation:
+  chronological_train_fraction: 0.70
+  classifier: sklearn.ensemble.RandomForestClassifier
+  classifier_parameters: sklearn_defaults
+  training_normal_undersample_random_state: 12
+  training_shuffle_random_state: 42
+  metrics: [PR-AUC, ROC-AUC, recall_at_1pct_FPR]
+  settings:
+    - random_to_random
+    - random_to_activity_matched
+    - activity_matched_to_activity_matched

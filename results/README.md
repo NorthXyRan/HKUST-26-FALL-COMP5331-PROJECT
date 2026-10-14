@@ -1,7 +1,9 @@
-# Preliminary experiment outputs
+# Results
 
-The `metrics_*.csv` files contain the three-seed comparison. Each `seed_<n>/`
-directory stores the metrics and a `summary.json` manifest with input hashes,
-TGF commit and extractor hash, versions, split counts/boundary, settings, and
-sub-seeds. Labeled injected streams and extracted feature tables are intentionally
-not tracked; reproduce them with `python -m src.experiment --seeds 42,43,44`.
+Tracked `metrics_*.csv` and `seed_*/` files are earlier preliminary runs. The
+current staged pipeline writes new outputs under a run-specific directory, for
+example `results/full_pipeline/seed_42/`. Generated streams, extracted feature
+tables, and optional baseline comparisons are ignored by Git because they can
+be regenerated from the recorded run configuration.
+
+Commands and output definitions are in [PIPELINE.md](../PIPELINE.md).

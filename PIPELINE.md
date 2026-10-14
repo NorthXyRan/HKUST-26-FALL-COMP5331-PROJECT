@@ -1,65 +1,132 @@
-# Reproduction pipeline (preliminary snapshot)
+# Experiment pipeline
 
-This repository contains the independent experiment driver, configuration, tests,
-and metrics. The official TGF source and UCI Messages input are not copied into
-this repository. They are available from the upstream TGF repository.
+Run commands from the project root with `.venv` activated and the pinned TGF
+checkout installed as described in [README.md](README.md). The pipeline has
+three explicit stages so the injected data, extracted predictors, and model
+results can be inspected independently.
 
-## Setup and run
+## 1. Inject
 
-From the repository root, clone the official implementation at the commit recorded
-in the result manifests, then create a Python virtual environment:
+Generate random and activity-matched injection streams using the same sampled
+timestamps. `--anomaly-percent` is the number injected divided by the number of
+original events. The final stream's anomaly share is therefore lower; for 5%
+injection relative to original edges, it is about 4.76%.
 
 ```bash
-git clone https://github.com/StephanyRajeh/TGF.git TGF
-git -C TGF checkout af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
-python -m src.experiment --seeds 42,43,44
+python -m src.pipeline inject \
+  --data data/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt \
+  --seed 42 \
+  --anomaly-percent 5 \
+  --output results/full_pipeline/seed_42
 ```
 
-The data path defaults to `TGF/1-PreprocessingOfDatasets/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt`.
-If the cleaned input is elsewhere, pass it with `--data`. The official feature
-extractor is called in place from `TGF/3-FeatureGeneration/main.py`; generated
-feature tables and labeled streams are ignored by Git because they can be
-regenerated from the recorded seeds.
+This writes `random_injected.tsv.gz`, `activity_matched_injected.tsv.gz`, and
+`run_config.json`. Timestamp sampling uses replacement and the two generators
+share the sampled schedule. Activity matching uses strict prior-time history
+(`t' < t`). The random generator is a seeded implementation of the timestamp
+and endpoint candidate procedure in TGF; the original shell scripts are
+unseeded.
 
-## Preliminary result
+## 2. Extract features
 
-The current run adds 2,989 anomalies (5% of 59,795 original events) per condition.
-The resulting combined stream has a 4.76% anomaly share. The Random Forest uses
-the official notebook's chronological 70/30 feature-row split, balanced training
-by undersampling normal rows with seed 12, training shuffle seed 42, and default
-`RandomForestClassifier` settings. The run uses TGF H histories 5, 50, 100, 1000,
-10000, and 15000, drops the 15,000 warm-up rows, and evaluates PR-AUC, ROC-AUC,
-and recall at 1% FPR.
+The untouched official extractor is invoked for each required history size.
+H5 is always run to obtain the official fraud label. For `H1000`, H5 is not a
+predictor; only the H1000 feature columns are used. `combined_H` uses H5, H50,
+H100, H1000, H10000, and H15000 predictors.
 
-| Train → test | PR-AUC mean (SD) | ROC-AUC mean (SD) | Recall at 1% FPR mean (SD) |
-|---|---:|---:|---:|
-| Random → random | 0.7541 (0.0061) | 0.9872 (0.0004) | 0.6228 (0.0057) |
-| Random → activity-matched | 0.2303 (0.0108) | 0.9014 (0.0059) | 0.0983 (0.0122) |
-| Activity-matched → activity-matched | 0.5282 (0.0176) | 0.9611 (0.0066) | 0.3525 (0.0386) |
+```bash
+python -m src.pipeline extract \
+  --run-dir results/full_pipeline/seed_42 \
+  --feature-set all
+```
 
-See [`results/metrics_all_seeds.csv`](results/metrics_all_seeds.csv),
-[`results/metrics_mean_sd.csv`](results/metrics_mean_sd.csv), and each seed's
-`summary.json` for exact values and code/data hashes.
+To extract one configuration only, pass `--feature-set H1000` or
+`--feature-set combined_H`. Feature CSVs are saved alongside the input streams.
 
-## Scope and limitations
+## 3. Evaluate
 
-These are preliminary results, not the final controlled comparison. The random
-injection is a seeded reimplementation of TGF's timestamp/global-node candidate
-procedure; upstream shell scripts use unseeded randomness. The activity-matched
-generator additionally requires a pair to be absent from strict prior history,
-while TGF's random candidate filter only excludes an exact timestamp/pair already
-in the input. The measured difference therefore includes both activity matching
-and candidate-eligibility differences.
+```bash
+python -m src.pipeline evaluate \
+  --run-dir results/full_pipeline/seed_42 \
+  --train-fraction 0.70
+```
 
-The experiment currently injects before making the chronological feature-row
-split, and the official extractor processes equal-timestamp rows sequentially.
-This reproduces the saved notebook's overall feature/training setup, but it does
-not yet satisfy the proposal's stricter split-before-injection and timestamp-strict
-history requirements for a final test. The feature extractor source remains
-unchanged; changes required for the final study should be implemented in the
-independent pipeline and clearly distinguished from the reproduction baseline.
+Each feature configuration evaluates the following chronological train/test
+settings:
+
+1. `random_to_random`
+2. `random_to_activity_matched`
+3. `activity_matched_to_activity_matched`
+
+The training set undersamples normal events to the anomaly count with
+`random_state=12`, then shuffles with `random_state=42`. The model is the
+scikit-learn default `RandomForestClassifier(random_state=seed)`. Metrics are
+PR-AUC, ROC-AUC, and recall at 1% FPR.
+
+Outputs include one metrics CSV per feature configuration,
+`metrics_all_configurations.csv`, `summary.json`, and `REPORT.md`.
+
+## Paper baseline comparison
+
+The main experiment does not compare against or depend on paper scores. To
+generate a separate comparison after evaluation, run:
+
+```bash
+python -m src.baseline_comparison \
+  --run-dir results/full_pipeline/seed_42
+```
+
+This writes `baseline_comparison.json` and `BASELINE_COMPARISON.md` in the run
+directory. The paper comparison uses only random→random ROC-AUC; the two
+activity-matched settings are project experiments and have no corresponding
+value in the paper's table.
+
+| Injection | Configuration | Local ROC-AUC | Paper ROC-AUC | Difference |
+|---:|---|---:|---:|---:|
+| 1% | H1000 | 0.95909 | 0.9580 | +0.00109 |
+| 1% | Combined H | 0.97996 | 0.9857 | **−0.00574** |
+| 5% | H1000 | 0.96683 | 0.9635 | +0.00333 |
+| 5% | Combined H | 0.98691 | 0.9876 | −0.00069 |
+| 10% | H1000 | 0.96315 | 0.9646 | −0.00145 |
+| 10% | Combined H | 0.98852 | 0.9872 | +0.00132 |
+
+Difference is local ROC-AUC minus the paper value. These are the current seed-42
+results. H1000 is close to the paper at all three injection rates. Combined H is
+also close at 5% and 10%; the largest gap is at 1% (−0.00574).
+
+## Three-setting results
+
+The following tables compare ROC-AUC across the three train/test generator
+settings. Random→random is the paper-comparable setting; activity-matched rows
+are the project's extension.
+
+### H1000
+
+| Injection | Random → Random | Random → Activity-matched | Activity-matched → Activity-matched |
+|---:|---:|---:|---:|
+| 1% | 0.95909 | 0.81854 | 0.86980 |
+| 5% | 0.96683 | 0.82833 | 0.87499 |
+| 10% | 0.96315 | 0.84254 | 0.88323 |
+
+### Combined H
+
+| Injection | Random → Random | Random → Activity-matched | Activity-matched → Activity-matched |
+|---:|---:|---:|---:|
+| 1% | 0.97996 | 0.88372 | 0.94365 |
+| 5% | 0.98691 | 0.89705 | 0.95354 |
+| 10% | 0.98852 | 0.90554 | 0.96882 |
+
+The cross-generator setting has lower ROC-AUC than random→random at each
+injection rate. Training and testing on activity-matched anomalies recovers
+some of that performance, while remaining below random→random.
+
+The paper does not publish injection seeds, and its dataset table reports
+59,835 UCI Messages links while the local preprocessed input contains 59,795.
+Treat the comparison as a protocol/metric check rather than an exact injected
+sample match.
+
+## Run tests
+
+```bash
+python -m unittest discover -s tests -v
+```

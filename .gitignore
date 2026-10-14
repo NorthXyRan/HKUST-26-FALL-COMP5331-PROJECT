@@ -7,3 +7,6 @@ results/seed_*/random_features.csv.gz
 results/seed_*/activity_matched_features.csv.gz
 results/seed_*/random_injected.tsv.gz
 results/seed_*/activity_matched_injected.tsv.gz
+results/full_pipeline/
+results/manual/
+results/paper_baseline_*/
