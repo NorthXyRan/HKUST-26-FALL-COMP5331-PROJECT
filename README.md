@@ -46,3 +46,12 @@ Optional extensions: community/proximity matching, MovieLens, fixed-budget featu
 2. **Presenter names:** On **every slide** of the PPT file, include the **name of that slide's presenter in the bottom-left corner**.
 3. **Q&A:** Be ready to answer questions from students and the instructor.
 4. **Questions for another group:** On the presentation day, our group will be assigned another group to ask questions. **Each member must ask at least one question** to that group during the assigned time slot.
+
+## Preliminary pipeline and initial results
+
+The current implementation, reproduction command, three-seed metrics, and known
+limitations are documented in [`PIPELINE.md`](PIPELINE.md). The pipeline calls the
+official TGF feature extractor at a pinned commit and keeps the independent
+generators and evaluation code in this repository. These results are an initial
+snapshot; they do not yet meet the split-before-injection and strict timestamp
+history requirements listed under M2/M4.
