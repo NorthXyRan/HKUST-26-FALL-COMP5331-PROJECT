@@ -27,6 +27,23 @@ share the sampled schedule. Activity matching uses strict prior-time history
 and endpoint candidate procedure in TGF; the original shell scripts are
 unseeded.
 
+By default, `activity_matched_injected.tsv.gz` uses Generator 1. Select
+Generator 2 with:
+
+```bash
+python -m src.pipeline inject \
+  --data data/UnipartiteNetworks/opsahl-ucsocial/ucimessages.txt \
+  --seed 42 --anomaly-percent 5 \
+  --generator rank_pool \
+  --rank-pool-window 1000 --rank-pool-candidates 10 \
+  --output results/full_pipeline/rank_pool_5p_seed_42
+```
+
+`--generator activity_matched` selects Generator 1. Generator 2 uses its own
+rank-window candidate pool and does not share the exact anomaly timestamp
+schedule with Generator 1; the selected strategy and parameters are recorded
+in `run_config.json`.
+
 ## 2. Extract features
 
 The untouched official extractor is invoked for each required history size.

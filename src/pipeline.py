@@ -12,6 +12,7 @@ import pandas as pd
 from .features import DEFAULT_HORIZONS, OFFICIAL_COMMIT, PROJECT, official_features
 from .injection import (
     make_activity_matched,
+    make_rank_pool,
     make_random_tgf_style,
     make_shared_timestamps,
     read_events,
@@ -35,16 +36,26 @@ def read_config(run_dir: Path) -> dict:
 
 
 def inject(data: Path, run_dir: Path, seed: int, anomaly_percent: float,
-           activity_window: int, activity_bins: int) -> None:
+           activity_window: int, activity_bins: int, generator: str,
+           rank_pool_window: int = 1000,
+           rank_pool_candidates: int = 10) -> None:
     events = read_events(data)
     n_anomalies = int(len(events) * anomaly_percent / 100)
     if n_anomalies < 1:
         raise ValueError("anomaly percentage yields zero injected events")
     timestamps = make_shared_timestamps(events, n_anomalies, seed)
-    matched = make_activity_matched(
-        events, timestamps, seed + 1,
-        activity_window=activity_window, bins=activity_bins,
-    )
+    if generator == "activity_matched":
+        matched = make_activity_matched(
+            events, timestamps, seed + 1,
+            activity_window=activity_window, bins=activity_bins,
+        )
+    else:
+        matched = make_rank_pool(
+            events, n_anomalies, seed=seed,
+            reference_seed=seed + 1,
+            activity_window=rank_pool_window,
+            candidates_per_endpoint=rank_pool_candidates,
+        )
     random_edges = make_random_tgf_style(events, timestamps, seed + 2)
     run_dir.mkdir(parents=True, exist_ok=True)
     write_stream(run_dir / "random_injected.tsv.gz", stream_rows(events, random_edges))
@@ -56,6 +67,9 @@ def inject(data: Path, run_dir: Path, seed: int, anomaly_percent: float,
         "original_events": len(events),
         "anomaly_percent_of_original": anomaly_percent,
         "injected_anomalies_per_condition": n_anomalies,
+        "matched_generator": generator,
+        "rank_pool_window_events": rank_pool_window,
+        "rank_pool_candidates_per_endpoint": rank_pool_candidates,
         "combined_stream_anomaly_share": n_anomalies / (len(events) + n_anomalies),
         "seeds": {
             "shared_timestamps": seed,
@@ -65,10 +79,14 @@ def inject(data: Path, run_dir: Path, seed: int, anomaly_percent: float,
             "training_normal_undersampling": 12,
             "training_shuffle": 42,
         },
-        "activity_window_events": activity_window,
-        "activity_quantile_bins": activity_bins,
-        "shared_timestamps_between_conditions": True,
-        "injection_history_policy": "strict timestamp < t; same-time rows enter history after generation",
+        "activity_window_events": activity_window if generator == "activity_matched" else rank_pool_window,
+        "activity_quantile_bins": activity_bins if generator == "activity_matched" else None,
+        "shared_timestamps_between_conditions": generator == "activity_matched",
+        "injection_history_policy": (
+            "strict timestamp < t; same-time rows enter history after generation"
+            if generator == "activity_matched"
+            else "candidate activity uses benign history only; injected anomalies do not feed back"
+        ),
         "label_horizon": 5,
         "chronological_train_fraction": 0.70,
         "feature_configurations": {},
@@ -199,6 +217,13 @@ def main(argv=None):
     p.add_argument("--anomaly-percent", type=float, default=5.0)
     p.add_argument("--activity-window", type=int, default=100)
     p.add_argument("--activity-bins", type=int, default=10)
+    p.add_argument(
+        "--generator", choices=("activity_matched", "rank_pool"),
+        default="activity_matched",
+        help="activity-matched generator used for activity_matched_injected.tsv.gz",
+    )
+    p.add_argument("--rank-pool-window", type=int, default=1000)
+    p.add_argument("--rank-pool-candidates", type=int, default=10)
     p = subparsers.add_parser("extract", help="extract features with official TGF code")
     p.add_argument("--run-dir", type=Path, required=True)
     p.add_argument("--feature-set", choices=(*FEATURE_CONFIGURATIONS, "all"), default="all")
@@ -207,10 +232,13 @@ def main(argv=None):
     p.add_argument("--train-fraction", type=float, default=0.70)
     args = parser.parse_args(argv)
     if args.stage == "inject":
-        if args.anomaly_percent <= 0 or args.activity_window <= 0 or args.activity_bins <= 0:
-            parser.error("anomaly percent, activity window, and activity bins must be positive")
+        if (args.anomaly_percent <= 0 or args.activity_window <= 0
+                or args.activity_bins <= 0 or args.rank_pool_window <= 0
+                or args.rank_pool_candidates <= 0):
+            parser.error("all injection and generator parameters must be positive")
         inject(args.data, args.output, args.seed, args.anomaly_percent,
-               args.activity_window, args.activity_bins)
+               args.activity_window, args.activity_bins, args.generator,
+               args.rank_pool_window, args.rank_pool_candidates)
     elif args.stage == "extract":
         extract(args.run_dir, args.feature_set)
     else:

@@ -5,6 +5,10 @@ from typing import Iterable, Sequence
 
 from ._common import Event, HistoryIndex, NoEligibleAnomalyError
 from .activity_matched import generate_activity_matched_anomaly
+from .activity_nearby import (
+    ActivityWindowIndex,
+    generate_rank_pool_anomalies,
+)
 from .random import generate_random_anomaly
 
 
@@ -44,4 +48,6 @@ __all__ = [
     "generate_anomaly",
     "generate_random_anomaly",
     "generate_activity_matched_anomaly",
+    "ActivityWindowIndex",
+    "generate_rank_pool_anomalies",
 ]

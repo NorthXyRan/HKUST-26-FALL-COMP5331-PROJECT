@@ -1,7 +1,13 @@
 import random
 import unittest
 
-from src.generators import HistoryIndex, NoEligibleAnomalyError, generate_anomaly
+from src.generators import (
+    ActivityWindowIndex,
+    HistoryIndex,
+    NoEligibleAnomalyError,
+    generate_anomaly,
+    generate_rank_pool_anomalies,
+)
 from src.generators._common import edge_key
 
 
@@ -49,6 +55,41 @@ class GeneratorTests(unittest.TestCase):
     def test_no_coverage_is_reported_not_random_fallback(self):
         with self.assertRaises(NoEligibleAnomalyError):
             generate_anomaly(2, "a", "b", [(1, "a", "b")], "random", rng=random.Random(0))
+
+    def test_activity_window_index_slides_and_enforces_strict_time(self):
+        index = ActivityWindowIndex(window=2)
+        index.add_batch([(1, "a", "b"), (1, "a", "c")])
+        self.assertEqual(index.activity["a"], 2)
+        index.add_batch([(2, "d", "e")])
+        self.assertEqual(index.activity["a"], 1)
+        self.assertEqual(index.activity["b"], 0)
+        self.assertEqual(index.activity["d"], 1)
+
+    def test_rank_pool_generator_returns_requested_unique_novel_edges(self):
+        events = [
+            (1, 1, 2), (2, 2, 3), (3, 3, 4), (4, 4, 5),
+            (5, 5, 6), (6, 6, 7), (7, 7, 8), (8, 8, 9),
+            (9, 9, 10), (10, 10, 11), (11, 11, 12),
+            (12, 1, 3), (13, 2, 4), (14, 5, 7), (15, 8, 10),
+        ]
+        generated = generate_rank_pool_anomalies(
+            events, 2, reference_count=2, window=10, candidates_per_endpoint=10,
+            timestamp_seed=5, reference_seed=7,
+        )
+        self.assertEqual(len(generated), 2)
+        self.assertEqual(len({edge_key(u, v) for _, u, v in generated}), 2)
+        prior = set()
+        by_time = {}
+        for t, u, v in events:
+            by_time.setdefault(t, []).append(edge_key(u, v))
+        generated_by_time = {}
+        for t, u, v in generated:
+            generated_by_time.setdefault(t, []).append(edge_key(u, v))
+        for t in sorted(by_time):
+            for pair in generated_by_time.get(t, []):
+                self.assertNotIn(pair, prior)
+                self.assertNotIn(pair, by_time[t])
+            prior.update(by_time[t])
 
 
 if __name__ == "__main__":

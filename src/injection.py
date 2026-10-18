@@ -6,7 +6,12 @@ import random
 from collections import defaultdict
 from pathlib import Path
 
-from .generators import HistoryIndex, NoEligibleAnomalyError, generate_activity_matched_anomaly
+from .generators import (
+    HistoryIndex,
+    NoEligibleAnomalyError,
+    generate_activity_matched_anomaly,
+    generate_rank_pool_anomalies,
+)
 
 
 def read_events(path: Path) -> list[tuple[int, int, int]]:
@@ -87,6 +92,22 @@ def make_activity_matched(events, timestamps, seed, *, activity_window=100, bins
         # Same-timestamp events become visible only after all candidates at t.
         history.add_batch([(t, u, v) for u, v in base_by_time[t]] + current)
     return generated
+
+
+def make_rank_pool(events, n_injected, *, seed=42, reference_seed=None,
+                   activity_window=1000, candidates_per_endpoint=10):
+    """Generate anomalies with the rank-window candidate-pool strategy."""
+    if reference_seed is None:
+        reference_seed = seed + 1
+    return generate_rank_pool_anomalies(
+        events,
+        n_injected,
+        reference_count=max(1, n_injected // 10),
+        window=activity_window,
+        candidates_per_endpoint=candidates_per_endpoint,
+        timestamp_seed=seed,
+        reference_seed=reference_seed,
+    )
 
 
 def make_random_tgf_style(events, timestamps, seed):
