@@ -1,0 +1,26 @@
+[
+  {
+    "run": "10p_seed_42",
+    "model_variants": 24,
+    "baseline_checks": 24,
+    "permutation_measurements": 90,
+    "inventoried_columns": 476,
+    "status": "passed"
+  },
+  {
+    "run": "1p_seed_42",
+    "model_variants": 24,
+    "baseline_checks": 24,
+    "permutation_measurements": 90,
+    "inventoried_columns": 476,
+    "status": "passed"
+  },
+  {
+    "run": "5p_seed_42",
+    "model_variants": 24,
+    "baseline_checks": 24,
+    "permutation_measurements": 90,
+    "inventoried_columns": 476,
+    "status": "passed"
+  }
+]

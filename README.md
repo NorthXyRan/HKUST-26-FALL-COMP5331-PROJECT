@@ -96,3 +96,8 @@ train/validation selection requirements above are not fully satisfied yet.
 2. **Presenter names:** Put each slide presenter's name in the bottom-left corner of every slide.
 3. **Q&A:** Prepare to answer questions from students and the instructor.
 4. **Questions for another group:** Each member must ask at least one question during the assigned slot.
+
+## M5 local feature analysis
+
+See [docs/M5.md](docs/M5.md) for feature definitions, reproducible ablation and
+importance commands, saved result locations, and the next team decisions.

@@ -1,0 +1,85 @@
+{
+  "base_commit": "178ef4f0d641b2eb07899f2af04530d446f2e800",
+  "input_sha256": {
+    "results/full_pipeline/5p_seed_42/run_config.json": "a07481fc527f67cb186f0e0e762b743ac762662a93114b860b74c91a2ca3b9cd",
+    "results/full_pipeline/5p_seed_42/random_features_H1000.csv.gz": "bf35efca85788e756e18b7e1a548a6d453fc01951e6c810cb799f748b32ff11a",
+    "results/full_pipeline/5p_seed_42/activity_matched_features_H1000.csv.gz": "2c49d0a6b7e0edbd76e49432020ea7949faa9eabdd5a358c4fd634d9aa25f01e",
+    "results/full_pipeline/5p_seed_42/random_features_combined_H.csv.gz": "8f8a6b6e90ded5085159fcd6eed7e6f1b9dd4f5f7bd7695f994707151bbcadc5",
+    "results/full_pipeline/5p_seed_42/activity_matched_features_combined_H.csv.gz": "9c032e737e20a86bfdf7daa936ff9240650ebf886718829102a527094ef2b788"
+  },
+  "source_sha256": {
+    "src/m5.py": "14a30f2711cc215003b2531bbb492f19f8e0d22c7d9e54f8689a99ea7bd26599",
+    "src/modeling.py": "b356ce4dcd44cb56e8a57d006889ad9adc873e1733b890c0b2068d5b8d629932",
+    "src/m5_report.py": "dda07120fa6b04d41ba5626b8c4f89fa7aa41bf3ea9c9da0833857b59a71527d",
+    "configs/m5_groups.json": "6a8abf9f0a6d1dd632f29a9a3fb1716240a10e1bc85ceab6c29755d83dc8b23c"
+  },
+  "python": "3.11.15",
+  "packages": {
+    "numpy": "1.26.4",
+    "pandas": "1.5.3",
+    "scikit-learn": "1.6.1",
+    "matplotlib": "3.9.4",
+    "scipy": "1.17.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0"
+  },
+  "train_fraction": 0.7,
+  "model_seed": 42,
+  "injection_seed": {
+    "shared_timestamps": 42,
+    "activity_matched_generator": 43,
+    "random_generator": 44,
+    "random_forest": 42,
+    "training_normal_undersampling": 12,
+    "training_shuffle": 42
+  },
+  "permutation_repeats": 5,
+  "permutation_seed": 31415,
+  "feature_sets": [
+    "H1000",
+    "combined_H"
+  ],
+  "groups": {
+    "endpoint_activity": [
+      "u_degree",
+      "v_degree",
+      "u_same_degree",
+      "v_same_degree",
+      "u_greater_degree",
+      "v_greater_degree",
+      "u_weighted_degree",
+      "v_weighted_degree",
+      "u_same_weighted_degree",
+      "v_same_weighted_degree",
+      "u_greater_weighted_degree",
+      "v_greater_weighted_degree"
+    ],
+    "pair_history": [
+      "u_v_weight",
+      "u_v_same_weight",
+      "u_v_greater_weight"
+    ],
+    "global_graph": [
+      "history_size",
+      "number_of_nodes",
+      "degrees_nb_one",
+      "degrees_nb_two",
+      "degrees_min",
+      "degrees_max",
+      "degrees_median",
+      "weighted_degrees_nb_one",
+      "weighted_degrees_nb_two",
+      "weighted_degrees_min",
+      "weighted_degrees_max",
+      "weighted_degrees_median",
+      "number_of_links",
+      "total_weight",
+      "link_weights_nb_one",
+      "link_weights_nb_two",
+      "link_weights_min",
+      "link_weights_max",
+      "link_weights_median"
+    ]
+  },
+  "scope": "Fixed existing single-injection-seed data; no generator changes or parameter tuning."
+}
