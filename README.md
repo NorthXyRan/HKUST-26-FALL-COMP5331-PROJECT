@@ -1,5 +1,8 @@
 # HKUST · COMP5331 · Fall 2026
 ## Stress-Testing Simple Graph Features under Controlled Link-Anomaly Injection
+
+中文初学者可以先阅读 [`docs/BEGINNER_RESEARCH_GUIDE_CN.md`](docs/BEGINNER_RESEARCH_GUIDE_CN.md)，了解研究动机、面对的问题、方法和目前完成的实验。
+
 ## Final M2/M4 protocol
 
 The canonical controlled comparison is [`results/final_m2_m4/`](results/final_m2_m4/).
