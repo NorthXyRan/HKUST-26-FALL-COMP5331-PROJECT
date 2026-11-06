@@ -84,16 +84,17 @@ Random Forest 可以理解为 100 棵决策树投票。每棵树会学习类似�
 
 combined-H 通常优于只用 H1000，说明短期与长期历史信号存在互补。不过这些结果还不能单独证明性能下降完全由 endpoint activity 引起，因为 matched 与 random 之间还可能存在 neighborhood、pair repetition 和 temporal burstiness 等残余差异。
 
-## 6. M5 要进一步回答什么
+## 6. M5 进一步回答了什么
 
-M5 会分别删除 endpoint activity、pair history、global graph 特征组并重新训练，再与 grouped permutation importance 对照。
+M5 分别删除 endpoint activity、pair history、global graph 特征组并重新训练，再与 grouped permutation importance 对照。正式实验覆盖三种注入率、三个 seed、两个特征集合和三种训练—测试设置，共得到 216 条消融结果和 810 次联合置换测量。
 
-它要回答：
+它主要观察到：
 
-- R→R 的高分主要依赖哪类特征？
-- 换成 matched 测试后，哪些特征的作用变化最大？
-- M→M 的性能恢复依赖哪些信息？
-- 这些结论在三个 injection seed 和不同注入率下是否稳定？
+- R→R 的高分高度依赖 endpoint activity。以 5% / combined-H 为例，删除该组后 AP 平均下降 0.4980；
+- R→M 中 endpoint activity 的作用明显减弱，而 pair history 更重要。同一配置删除两组的 AP drop 分别为 0.0804 和 0.1501；
+- M→M 的恢复同时使用 endpoint activity 和 pair history，同一配置的 AP drop 分别为 0.3615 和 0.3683；
+- global graph 的消融/置换影响通常接近零且偶尔为负，不是稳定的主要信号；
+- 三个 seed 上的主要方向一致，但 recall@1% FPR 在低正例数下波动较大。
 
 消融不是简单把训练好的模型某列清零，而是删除整组特征后重新训练，因此可以观察剩余特征能否替代被删除的信息。Permutation importance 则固定完整模型，只打乱某一组，用于观察现有模型对该组的依赖。两者回答的问题不同，结果不必完全一致。
 
@@ -103,7 +104,9 @@ M5 会分别删除 endpoint activity、pair history、global graph 特征组并�
 - **M2**：random/activity-matched controlled injection 与严格历史规则已冻结。
 - **M4**：三注入率、三 seed、两特征集、三设置的最终比较已完成。
 - **M3**：完整分布诊断、neighborhood、pair-history residual 和 burstiness 解释尚未完成。
-- **M5**：旧 seed-42 原型已存在；迁移到最终 M2/M4 协议、多 seed 正式消融仍待实现。
+- **M5**：最终多 seed 消融、联合置换、MDI、漂移审计、中文报告和独立校验已完成。
+
+M3 仍是当前主要前置依赖。M5 证明的是模型对特征组的依赖关系，不能单独说明生成器为什么改变了 neighborhood overlap、重复交互或 temporal burstiness；这些机制解释仍需 M3 diagnostics。
 
 ## 8. 研究贡献可以怎样概括
 

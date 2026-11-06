@@ -1,5 +1,7 @@
 # Final M5 阶段 A：基线测试报告
 
+> 本文件保留阶段 A 的历史快照。Final M5 后续实验现已完成，正式结论和产物请见 [`results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)。
+
 日期：2026 年 11 月 6 日  
 分支：`final-m5`  
 起点：`main@e5c2e73`

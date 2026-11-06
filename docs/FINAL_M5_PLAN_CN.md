@@ -224,3 +224,15 @@ python -m unittest discover -s tests -v
 - 多 seed 配对汇总、中文报告、图和 manifest 已生成；
 - M3 证据已接入，或所有依赖 M3 的结论明确标记为未完成；
 - `git status` 只包含经过审查、计划提交的代码、测试、文档和正式产物。
+
+## 9. 执行结果（2026-11-06）
+
+阶段 B–D 已完成：
+
+- 31 项测试中 30 项通过，1 项因可选 pinned TGF checkout 不存在而跳过；
+- 54 个 full-model 上下文的 test event、时间和标签逐行一致，预测漂移审计通过；
+- 216 条 retrained ablation、810 条 grouped permutation、6,426 条 MDI 记录完整；
+- 多 seed 配对汇总、图片、中文报告和 manifest 已生成；
+- 独立 verifier 已通过所有输入/源码/输出哈希、计数和数值关系检查。
+
+正式报告位于 [`results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)。阶段 E 仍受 M3 diagnostics 前置依赖限制；报告已将 neighborhood、prior-pair residual、degree residual 和 burstiness 的机制归因明确标记为 pending。
