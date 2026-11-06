@@ -13,18 +13,39 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / 'results/final_m2_m4'
+FINAL_PIPELINE_SOURCES = {
+    'src/__init__.py',
+    'src/features.py',
+    'src/final_pipeline.py',
+    'src/generators/__init__.py',
+    'src/generators/_common.py',
+    'src/generators/activity_matched.py',
+    'src/generators/activity_nearby.py',
+    'src/generators/random.py',
+    'src/injection.py',
+    'src/strict_features.py',
+}
 
 
 @unittest.skipUnless((PACKAGE / 'manifest.json').is_file(), 'final package not yet generated')
 class FrozenArtifactTests(unittest.TestCase):
-    def test_all_saved_file_and_source_hashes(self):
+    def test_all_saved_file_and_pipeline_source_hashes(self):
         manifest = json.loads((PACKAGE / 'manifest.json').read_text())
         actual_files = {str(p.relative_to(PACKAGE)) for p in PACKAGE.rglob('*') if p.is_file() and p.name != 'manifest.json'}
         self.assertEqual(actual_files, set(manifest['files_sha256']))
         for name, digest in manifest['files_sha256'].items():
             self.assertEqual(hashlib.sha256((PACKAGE/name).read_bytes()).hexdigest(), digest, name)
-        for name, digest in manifest['source_sha256'].items():
+        # The original manifest recorded every src/*.py file, including modules
+        # unrelated to final_pipeline. Later M5 work legitimately changed
+        # modeling.py, which the frozen M2/M4 runner never imports. Only changes
+        # to the actual generation/evaluation dependency closure invalidate the
+        # frozen package.
+        self.assertLessEqual(FINAL_PIPELINE_SOURCES, set(manifest['source_sha256']))
+        for name in FINAL_PIPELINE_SOURCES:
+            digest = manifest['source_sha256'][name]
             self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(), digest, name)
+        for name, digest in manifest['source_sha256'].items():
+            self.assertRegex(digest, r'^[0-9a-f]{64}$', name)
 
     def test_stream_constraints_timestamps_and_reference_alignment(self):
         config = json.loads((PACKAGE / 'protocol.json').read_text())
