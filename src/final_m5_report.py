@@ -100,6 +100,15 @@ def write_report(output: Path, tables):
 
     rates = sorted(ablations.rate.unique())
     seeds = sorted(ablations.seed.unique())
+    focus_rate = 5 if 5 in rates else rates[0]
+    focus = summary[
+        (summary.rate == focus_rate)
+        & (summary.feature_set == "combined_H")
+    ].set_index(["setting", "omitted_group"])
+    focus_full = {
+        setting: focus.loc[(setting, "none"), "pr_auc_mean"]
+        for setting in SETTING_LABELS
+    }
     lines = [
         "# Final M5：特征组影响分析",
         "",
@@ -108,13 +117,12 @@ def write_report(output: Path, tables):
         f"本实验使用冻结的 `strict_m2_m4_v1` 输入，覆盖注入率 {rates}、seeds {seeds}、H1000/combined-H，以及 R→R、R→M、M→M。",
         "每个上下文训练完整模型及三个删除特征组后的模型；所有模型均只使用 train 训练，并用训练条件对应的 validation 集重新校准 1% FPR 阈值。",
         "",
-        f"完整模型通过冻结 M4 的跨平台漂移审计：**{bool(checks.matches.all() and prediction_checks.matches.all())}**。54 个上下文的 test event/时间/标签逐行完全一致；预测分数相关系数最低为 {number(prediction_checks.score_correlation.min(), 6)}，平均绝对分数差最大为 {number(prediction_checks.mean_absolute_score_difference.max(), 6)}，分类一致率最低为 {number(prediction_checks.prediction_agreement.min(), 6)}。",
+        f"完整模型通过冻结 M4 的跨平台漂移审计：**{'通过' if checks.matches.all() and prediction_checks.matches.all() else '未通过'}**。{len(prediction_checks)} 个上下文的 test event/时间/标签逐行完全一致；预测分数相关系数最低为 {number(prediction_checks.score_correlation.min(), 6)}，平均绝对分数差最大为 {number(prediction_checks.mean_absolute_score_difference.max(), 6)}，分类一致率最低为 {number(prediction_checks.prediction_agreement.min(), 6)}。",
         "冻结结果来自 macOS ARM/Python 3.9，本次 Final M5 来自 Linux x86/Python 3.11；随机森林跨平台重训并非 bitwise 相同。冻结 M4 只用于输入、协议和漂移审计，M5 的 full/ablation 配对比较全部来自同一当前环境。",
         "指标漂移使用预先固定的灾难性漂移护栏，而不是把宽容差解释为数值等价；低正例率下 recall 会随少数样本跨过阈值而离散跳变。各指标最大绝对差如下。",
         "",
         "| 指标 | 最大绝对差 | 护栏 |",
         "|---|---:|---:|",
-        "",
     ]
     for metric, frame in checks.groupby("metric", sort=False):
         lines.append(
@@ -125,7 +133,15 @@ def write_report(output: Path, tables):
         "",
         "正的 AP drop 表示删除/打乱该组后性能下降；负值表示性能反而上升。后者可能来自相关特征替代、噪声或有限样本，不应直接解释为该组‘有害’。",
         "",
-        "## 2. 完整模型结果",
+        "## 2. 主要发现",
+        "",
+        f"- **跨生成器泛化明显下降。** 以 {focus_rate}% / combined-H 为例，完整模型 AP 从 R→R 的 {number(focus_full['random_to_random'])} 降至 R→M 的 {number(focus_full['random_to_activity_matched'])}；改用 matched 数据训练后，M→M 恢复到 {number(focus_full['activity_matched_to_activity_matched'])}。",
+        f"- **随机异常成绩高度依赖端点活动。** 同一配置中，删除 endpoint activity 后 R→R 的 AP 平均下降 {number(focus.loc[('random_to_random', 'endpoint_activity'), 'pr_auc_drop_mean'])}，说明随机生成器留下了强烈的活动量捷径。",
+        f"- **matched 异常更依赖 pair history。** {focus_rate}% / combined-H 的 R→M 中，删除 pair history 的 AP drop 为 {number(focus.loc[('random_to_activity_matched', 'pair_history'), 'pr_auc_drop_mean'])}，高于删除 endpoint activity 的 {number(focus.loc[('random_to_activity_matched', 'endpoint_activity'), 'pr_auc_drop_mean'])}；M→M 中两者分别为 {number(focus.loc[('activity_matched_to_activity_matched', 'pair_history'), 'pr_auc_drop_mean'])} 与 {number(focus.loc[('activity_matched_to_activity_matched', 'endpoint_activity'), 'pr_auc_drop_mean'])}。",
+        "- **global graph 不是稳定的主信号。** 它的消融和置换影响通常接近零、偶尔为负；结合相关特征替代问题，不能把负值解释为该组具有因果危害。",
+        "- **这些是模型侧关联证据。** M3 diagnostics 尚未冻结，所以目前不能把变化进一步归因于 neighborhood overlap、重复交互或 burstiness。",
+        "",
+        "## 3. 完整模型结果",
         "",
         "| 注入率 | 特征 | 设置 | AP | ROC-AUC | Recall@val-1%FPR | Test FPR |",
         "|---:|---|---|---:|---:|---:|---:|",
@@ -141,7 +157,7 @@ def write_report(output: Path, tables):
 
     lines.extend([
         "",
-        "## 3. 重新训练消融：AP 变化",
+        "## 4. 重新训练消融：AP 变化",
         "",
         "下表是 `完整模型 AP − 删除该组后 AP` 的跨 seed 均值和样本标准差。",
         "",
@@ -156,7 +172,7 @@ def write_report(output: Path, tables):
 
     lines.extend([
         "",
-        "## 4. Grouped permutation importance",
+        "## 5. Grouped permutation importance",
         "",
         "完整模型保持不变，同一组的全部列（包括 combined-H 的所有窗口）使用相同的 test-row 排列。先在每个 seed 内对 5 次 shuffle 求均值，再跨 seed 汇总。",
         "",
@@ -172,7 +188,7 @@ def write_report(output: Path, tables):
 
     lines.extend([
         "",
-        "## 5. 跨条件变化与 matched retraining recovery",
+        "## 6. 跨条件变化与 matched retraining recovery",
         "",
         "`R→M − R→R` 衡量跨生成器性能变化；`M→M − R→M` 衡量在 matched 条件重新训练后的恢复。",
         "",
@@ -188,7 +204,7 @@ def write_report(output: Path, tables):
 
     lines.extend([
         "",
-        "## 6. 如何解读这些证据",
+        "## 7. 如何解读这些证据",
         "",
         "- Retrained ablation 询问：没有某组特征时，其余特征重新学习后还能达到什么性能。",
         "- Grouped permutation 询问：已经训练好的完整模型当前依赖某组到什么程度。",
@@ -196,11 +212,11 @@ def write_report(output: Path, tables):
         "- 三个特征组并不统计独立；endpoint rank 与 pair rank 本身也依赖全图分布。",
         "- `global_graph` 不是 common-neighbor/Jaccard neighborhood 特征，本报告不会把它改名为 neighborhood。",
         "",
-        "## 7. 尚未完成的机制解释",
+        "## 8. 尚未完成的机制解释",
         "",
         "M3 的完整 diagnostics 尚未冻结，因此当前结果只能说明特征组与性能变化的关联。关于 neighborhood overlap、prior-pair residual、degree residual 和 temporal burstiness 的解释仍为 pending，不能从消融结果单独推出因果结论。",
         "",
-        "## 8. 局限",
+        "## 9. 局限",
         "",
         "结果仅覆盖 UCI Messages、固定 TGF-style 特征、固定 Random Forest 和三个 injection/model seeds。Permutation repeats 表示 shuffle 波动，不是新的独立数据集。所有结论应限制在当前实验范围内。",
         "",
