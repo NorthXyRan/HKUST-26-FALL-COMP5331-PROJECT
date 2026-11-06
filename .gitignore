@@ -3,3 +3,5 @@ TGF/
 __pycache__/
 *.py[cod]
 .DS_Store
+
+work/

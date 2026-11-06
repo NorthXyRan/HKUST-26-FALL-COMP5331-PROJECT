@@ -1,0 +1,22 @@
+{
+  "random": {
+    "generated": 2989,
+    "generation_seconds": 1.9262380840000048,
+    "feature_seconds": 14.397642583000021,
+    "mean_activity_error": 1.9326153516693987,
+    "median_activity_error": 1.8990393730394641,
+    "p90_activity_error": 3.248688700139931,
+    "same_time_rejections": 0,
+    "constraint_violations": 0
+  },
+  "activity_matched": {
+    "generated": 2989,
+    "generation_seconds": 3.923463833999989,
+    "feature_seconds": 14.69454595800002,
+    "mean_activity_error": 0.6408095434436942,
+    "median_activity_error": 0.490414626505863,
+    "p90_activity_error": 1.4186799740230294,
+    "same_time_rejections": 0,
+    "constraint_violations": 0
+  }
+}

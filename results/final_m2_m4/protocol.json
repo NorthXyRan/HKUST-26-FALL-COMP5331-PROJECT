@@ -1,0 +1,86 @@
+{
+  "protocol_version": "strict_m2_m4_v1",
+  "matched_generator": "activity_matched",
+  "selected_activity_window": 1000,
+  "selected_bins": 10,
+  "selection_grid": [
+    [
+      100,
+      2
+    ],
+    [
+      100,
+      5
+    ],
+    [
+      100,
+      10
+    ],
+    [
+      1000,
+      2
+    ],
+    [
+      1000,
+      5
+    ],
+    [
+      1000,
+      10
+    ]
+  ],
+  "selection_seed": 42,
+  "selection_rate": 5,
+  "diagnostic_activity_window": 1000,
+  "selection_objective": "feasibility, validation mean error, validation p90, smaller window, fewer bins",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "rates_percent_of_original": [
+    1,
+    5,
+    10
+  ],
+  "warmup_benign_events": 15000,
+  "split_fractions": [
+    0.6,
+    0.2,
+    0.2
+  ],
+  "train_end_exclusive": 1085500567,
+  "validation_end_exclusive": 1086888672,
+  "history": "all previous observed benign and injected events, strictly t_prime < t; carry across splits",
+  "candidate_nodes": "previously observed nodes only, including currently inactive nodes",
+  "candidate_pairs": "undirected; no self-loop, historical pair, same-time benign pair or duplicate",
+  "coverage_policy": "4096 proposals then exact same-bin reservoir; 256 same-time collision retries; fail closed; no bin widening or random fallback",
+  "timestamps": "uniform distinct eligible times with replacement within fixed splits; identical schedule and reference RNG for both conditions",
+  "quota": "floor(rate * total benign events), allocated proportionally by split via largest remainders; initial warm-up has no anomalies",
+  "features": "independent strict-history TGF-style implementation; absent counters zero; lower median; no current-event insertion",
+  "feature_horizons": [
+    5,
+    50,
+    100,
+    1000,
+    10000,
+    15000
+  ],
+  "label": "original injected row label, not inferred",
+  "classifier": {
+    "type": "RandomForestClassifier",
+    "n_estimators": 100,
+    "criterion": "gini",
+    "max_depth": null,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "max_features": "sqrt",
+    "bootstrap": true,
+    "n_jobs": 1
+  },
+  "training_balance": "normal undersampling to anomaly count with seed 12; shuffle seed 42",
+  "threshold": "training-condition validation negatives only; lowest threshold satisfying validation FPR <= .01; fixed before test",
+  "reproduction_baseline": "legacy src.pipeline and results/full_pipeline remain separate; final metrics are not exact upstream reproduction",
+  "upstream_formula_reference_commit": "af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b",
+  "dataset_sha256": "4af48bab1dfa28ccb48f77f491815f7525535061076f8fe822a98c46482bb772"
+}

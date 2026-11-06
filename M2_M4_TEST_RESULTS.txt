@@ -1,0 +1,26 @@
+test_all_saved_file_and_source_hashes (test_final_artifacts.FrozenArtifactTests) ... ok
+test_feature_metadata_and_split_membership (test_final_artifacts.FrozenArtifactTests) ... ok
+test_metrics_recompute_and_thresholds_are_shared (test_final_artifacts.FrozenArtifactTests) ... ok
+test_stream_constraints_timestamps_and_reference_alignment (test_final_artifacts.FrozenArtifactTests) ... ok
+test_both_conditions_share_constraints_and_are_reproducible (test_final_pipeline.ProtocolTests) ... ok
+test_schedule_paired_exact_and_no_early_injection (test_final_pipeline.ProtocolTests) ... ok
+test_split_keeps_timestamp_ties_together (test_final_pipeline.ProtocolTests) ... ok
+test_test_labels_do_not_select_threshold_or_scores (test_final_pipeline.ProtocolTests) ... ok
+test_threshold_handles_ties_within_validation_budget (test_final_pipeline.ProtocolTests) ... ok
+test_current_and_simultaneous_events_cannot_change_features (test_final_pipeline.StrictFeaturesTests) ... ok
+test_even_distributions_use_upstream_lower_median (test_final_pipeline.StrictFeaturesTests) ... ok
+test_feature_formulas_match_upstream_on_identical_history (test_final_pipeline.StrictFeaturesTests) ... ok
+test_sliding_graph_matches_bruteforce (test_final_pipeline.StrictFeaturesTests) ... ok
+test_unseen_endpoints_and_empty_history (test_final_pipeline.StrictFeaturesTests) ... ok
+test_activity_matched_strategy_is_available (test_generators.GeneratorTests) ... ok
+test_activity_window_index_slides_and_enforces_strict_time (test_generators.GeneratorTests) ... ok
+test_incremental_history_index_is_strict_and_seeded (test_generators.GeneratorTests) ... ok
+test_no_coverage_is_reported_not_random_fallback (test_generators.GeneratorTests) ... ok
+test_random_is_seeded_novel_and_non_loop (test_generators.GeneratorTests) ... ok
+test_rank_pool_generator_returns_requested_unique_novel_edges (test_generators.GeneratorTests) ... ok
+test_same_timestamp_and_future_edges_are_invisible (test_generators.GeneratorTests) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 6.398s
+
+OK

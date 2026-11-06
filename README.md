@@ -1,5 +1,16 @@
 # HKUST · COMP5331 · Fall 2026
 ## Stress-Testing Simple Graph Features under Controlled Link-Anomaly Injection
+## Final M2/M4 protocol
+
+The canonical controlled comparison is [`results/final_m2_m4/`](results/final_m2_m4/).
+It uses the original activity-bin method with validation-selected parameters,
+aligned random/matched eligibility and timestamps, strict pre-timestamp features,
+fixed 60/20/20 benign-stream splits, validation-only thresholds, and seeds 42–44.
+See the package README for M5 instructions and limitations. Run it with
+`python -m src.final_pipeline --output results/reproduced_m2_m4` (fresh directory).
+The older `src.pipeline` commands and `results/full_pipeline` scores below remain
+legacy reproduction/preliminary artifacts; they do not define the final protocol.
+
 ## Important Dates
 
 All dates are in **2026**. All times are in **Hong Kong time (HKT, UTC+8)**.
@@ -19,14 +30,14 @@ All dates are in **2026**. All times are in **Hong Kong time (HKT, UTC+8)**.
 
 The dates below are internal targets in **2026 (HKT)**. The official deadlines remain those listed above. The core study uses **UCI Messages, two anomaly generators, TGF features, and three train/test settings**.
 
-The seeded random baseline, activity-matched generator, and one-seed main comparison are now implemented. Generator diagnostics, repeated-seed analysis, ablations, and the final report remain in progress.
+The final M2/M4 controlled protocol and repeated-seed runs are recorded in the canonical package above. M3 interpretation, M5 ablations, and the final report remain separate work.
 
 | Milestone | Target | Completion criteria |
 | --- | --- | --- |
 | ~~**M1: Reproduce the TGF baseline**~~ | ~~**16 October**~~ | ~~Run the official TGF pipeline with random injection on UCI Messages. Compare with the published results for the corresponding settings and investigate discrepancies. Record the data/code versions, preprocessing, history configuration, classifier settings, anomaly proportion, seeds, and reproduction command.~~ |
-| **M2: Implement controlled injection** | **23 October** | ~~Provide random and activity-matched generators through a common interface.~~ The activity-matched generator uses strict prior-timestamp history (`t' < t`); strict equal-timestamp handling in official feature extraction, validation-based selection of the activity window/binning, and eligibility/fallback documentation remain pending. |
+| **M2: Implement controlled injection** | **23 October** | ~~Provide random and activity-matched generators through a common interface.~~ Final protocol: validation-selected window/bin settings, aligned eligibility/history, independent strict pre-timestamp feature extraction, and frozen data/configuration in `results/final_m2_m4/`. |
 | **M3: Validate generator matching** | **27 October** | Compare normal edges, random anomalies, and matched anomalies using distribution plots and diagnostic statistics. Verify that endpoint-activity discrepancies shrink; report residual differences in degree, neighborhood structure, pair history, and temporal burstiness. If matching is ineffective, revise M2 before proceeding. |
-| **M4: Complete the main comparison** | **2 November** | ~~Run **random -> random**, **random -> matched**, and **matched -> matched** at 1%, 5%, and 10% injection with seed 42; keep the split, feature definitions, classifier, and evaluation rules consistent; pair timestamps; report PR-AUC, ROC-AUC, recall at 1% FPR, and performance deltas.~~ **Pending:** repeat across seeds and report variability. |
+| **M4: Complete the main comparison** | **2 November** | ~~Run **random -> random**, **random -> matched**, and **matched -> matched** at 1%, 5%, and 10% injection with seed 42; keep the split, feature definitions, classifier, and evaluation rules consistent; pair timestamps; report PR-AUC, ROC-AUC, recall at 1% FPR, and performance deltas.~~ Final controlled comparison repeats seeds 42–44 with validation-calibrated thresholds, actual test FPR, paired deltas, and variability in `results/final_m2_m4/`. |
 | **M5: Explain the feature-level effects** | **6 November** | Define and ablate the endpoint-activity, pair-history, and neighborhood feature groups, retraining each model. Combine ablation and feature-importance evidence with M3 diagnostics to explain performance changes. Use M4 to assess how much matched-condition retraining recovers performance; limit conclusions to the tested features and classifier. |
 | **M6: Finalize the report and reproducibility package** | **12 November** | Answer RQ1-RQ3 with the main results, diagnostics, ablations, uncertainty, and limitations. Include code attribution, configurations, seeds, and runnable instructions. Ensure every reported result is traceable to a saved run. Finish the report for submission by **13 November, 13:30**. |
 | **M7: Prepare the presentation** | **26 November** | Finish the slides and source-code package, assign speaking sections to all six members, and rehearse within the presentation limits below. Submit the presentation order form, slides, and source code before the assigned session on **29 November, 09:00-10:30**. |

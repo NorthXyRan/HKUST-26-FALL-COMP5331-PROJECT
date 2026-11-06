@@ -1,5 +1,17 @@
 # Experiment pipeline
 
+## Canonical final M2/M4 run
+
+```sh
+python -m src.final_pipeline --output results/reproduced_m2_m4
+python -m unittest discover -s tests -v
+```
+
+Use a fresh output directory. The frozen package is `results/final_m2_m4/`; its
+README defines the final protocol and the exact M5 handoff. The stages below are
+the legacy reproduction pipeline and retain their original semantics.
+
+
 Run commands from the project root with `.venv` activated and the pinned TGF
 checkout installed as described in [README.md](README.md). The pipeline has
 three explicit stages so the injected data, extracted predictors, and model
