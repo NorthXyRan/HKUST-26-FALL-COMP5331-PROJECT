@@ -18,6 +18,18 @@ def recall_at_fpr(y_true, scores, max_fpr=0.01):
     return float(predicted[positives].mean()), float(predicted[~positives].mean())
 
 
+def fit_model(train: pd.DataFrame, seed: int):
+    """Fit the shared M4/M5 classifier with the fixed training sample."""
+    label = "H5_is_fraud"
+    normal = train.loc[train[label] == 0]
+    anomaly = train.loc[train[label] == 1]
+    balanced = pd.concat([normal.sample(n=len(anomaly), random_state=12), anomaly])
+    balanced = balanced.sample(frac=1, random_state=42)
+    model = RandomForestClassifier(random_state=seed)
+    model.fit(balanced.drop(columns=label), balanced[label].astype(int))
+    return model
+
+
 def fit_and_score(train: pd.DataFrame, test: pd.DataFrame, seed: int):
     label = "H5_is_fraud"
     y_train = train[label].astype(int)
@@ -25,10 +37,7 @@ def fit_and_score(train: pd.DataFrame, test: pd.DataFrame, seed: int):
     normal, anomaly = train.loc[y_train == 0], train.loc[y_train == 1]
     if normal.empty or anomaly.empty or y_test.nunique() < 2:
         raise ValueError("chronological split must contain both classes in train and test")
-    balanced = pd.concat([normal.sample(n=len(anomaly), random_state=12), anomaly])
-    balanced = balanced.sample(frac=1, random_state=42)
-    model = RandomForestClassifier(random_state=seed)
-    model.fit(balanced.drop(columns=label), balanced[label].astype(int))
+    model = fit_model(train, seed)
     scores = model.predict_proba(test.drop(columns=label))[:, 1]
     recall, actual_fpr = recall_at_fpr(y_test, scores)
     return {
