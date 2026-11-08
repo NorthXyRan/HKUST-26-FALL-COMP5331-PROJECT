@@ -112,3 +112,17 @@ train/validation selection requirements above are not fully satisfied yet.
 
 See [docs/M5.md](docs/M5.md) for feature definitions, reproducible ablation and
 importance commands, saved result locations, and the next team decisions.
+
+## M3 generator diagnostics
+
+The strict-protocol M3 analysis is available in [docs/M3.md](docs/M3.md), with
+[results and seven figures](results/m3/REPORT.md). It covers 18 streams, three
+diagnostic windows, observed/common-benign histories, interval burstiness, paired
+activity effects and residual structure. Two-member ownership is recorded in the
+handoff. Run `python -m src.m3 --output results/m3_reproduced`, then
+`python -m src.m3_verify results/m3_reproduced`.
+
+M3 uses `results/final_m2_m4`; the existing M5 package uses legacy
+`results/full_pipeline`. Their results must be protocol-aligned before combining
+claims. The original milestone table above is historical progress context; see the
+M3 report for this completed diagnostic run.
