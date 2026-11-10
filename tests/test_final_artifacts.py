@@ -4,6 +4,7 @@ import math
 from itertools import groupby
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 import unittest
 
@@ -13,18 +14,55 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / 'results/final_m2_m4'
+FINAL_PIPELINE_SOURCES = {
+    'src/__init__.py',
+    'src/features.py',
+    'src/final_pipeline.py',
+    'src/generators/__init__.py',
+    'src/generators/_common.py',
+    'src/generators/activity_matched.py',
+    'src/generators/activity_nearby.py',
+    'src/generators/random.py',
+    'src/injection.py',
+    'src/strict_features.py',
+}
 
 
 @unittest.skipUnless((PACKAGE / 'manifest.json').is_file(), 'final package not yet generated')
 class FrozenArtifactTests(unittest.TestCase):
-    def test_all_saved_file_and_source_hashes(self):
+    def test_all_saved_file_and_pipeline_source_hashes(self):
         manifest = json.loads((PACKAGE / 'manifest.json').read_text())
         actual_files = {str(p.relative_to(PACKAGE)) for p in PACKAGE.rglob('*') if p.is_file() and p.name != 'manifest.json'}
         self.assertEqual(actual_files, set(manifest['files_sha256']))
         for name, digest in manifest['files_sha256'].items():
             self.assertEqual(hashlib.sha256((PACKAGE/name).read_bytes()).hexdigest(), digest, name)
+        # The saved experiment predates M5's modeling.py refactor. Validate the
+        # immutable producing snapshot when Git history is available. Exported
+        # source snapshots may not include that commit, so their fallback still
+        # validates the actual final_pipeline dependency closure against current
+        # files and validates every remaining digest's shape.
+        producing_commit = '8cf638c122937aeceee5c77a641f69b75bf08276'
+        commit_available = subprocess.run(
+            ['git', 'cat-file', '-e', f'{producing_commit}^{{commit}}'],
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        ).returncode == 0
+        self.assertLessEqual(FINAL_PIPELINE_SOURCES, set(manifest['source_sha256']))
         for name, digest in manifest['source_sha256'].items():
-            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(), digest, name)
+            self.assertRegex(digest, r'^[0-9a-f]{64}$', name)
+            if commit_available:
+                saved = subprocess.run(
+                    ['git', 'show', f'{producing_commit}:{name}'],
+                    cwd=ROOT,
+                    capture_output=True,
+                    check=True,
+                ).stdout
+                self.assertEqual(hashlib.sha256(saved).hexdigest(), digest, name)
+            elif name in FINAL_PIPELINE_SOURCES:
+                self.assertEqual(
+                    hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest, name
+                )
 
     def test_stream_constraints_timestamps_and_reference_alignment(self):
         config = json.loads((PACKAGE / 'protocol.json').read_text())

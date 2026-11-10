@@ -1,0 +1,107 @@
+{
+  "protocol": "final_m3_m5_integration_v1",
+  "primary_diagnostic": {
+    "split": "test",
+    "history_policy": "observed",
+    "window": 1000
+  },
+  "counts": {
+    "joint_rows": 18,
+    "m3_rate_seed_pairs": 9,
+    "m5_ablations": 216,
+    "m5_permutation_measurements": 810,
+    "m5_mdi_rows": 6426
+  },
+  "m3": {
+    "activity_error_reduction_pct_mean": 56.36999714141116,
+    "activity_error_reduction_pct_sample_sd": 1.7456437990740912,
+    "activity_error_reduction_pct_min": 53.71593632859284,
+    "activity_error_reduction_pct_max": 59.86813065165014,
+    "m3_ks_random_degree_mean": 0.8544806997492419,
+    "m3_ks_activity_matched_degree_mean": 0.41702110052493685,
+    "m3_ks_random_common_neighbors": 0.12548051550609093,
+    "m3_ks_activity_matched_common_neighbors": 0.07129897666982067,
+    "m3_ks_random_jaccard": 0.12548051550609093,
+    "m3_ks_activity_matched_jaccard": 0.07708702209980985,
+    "m3_ks_random_pair_count": 0.8332380889925647,
+    "m3_ks_activity_matched_pair_count": 0.8350032320620555,
+    "m3_ks_random_recency_minutes": 0.8439546358164902,
+    "m3_ks_activity_matched_recency_minutes": 0.5307843252275009,
+    "m3_ks_random_burstiness": 0.19261153334337083,
+    "m3_ks_activity_matched_burstiness": 0.07315991291068863,
+    "anomaly_pair_count_zero_fraction_mean": 1.0,
+    "normal_reference_pair_count_zero_fraction_mean": 0.16587933947268982
+  },
+  "m5_pr_auc_drop": {
+    "random_to_random": {
+      "endpoint_activity": {
+        "mean": 0.33787872267283087,
+        "sample_sd": 0.154899127885532,
+        "min": 0.0561505662608473,
+        "max": 0.5228520453365095
+      },
+      "pair_history": {
+        "mean": -0.005880864681502762,
+        "sample_sd": 0.024918920844656224,
+        "min": -0.0394609638569812,
+        "max": 0.0473904435797361
+      },
+      "global_graph": {
+        "mean": 0.009018605812268017,
+        "sample_sd": 0.056822401715727715,
+        "min": -0.0652702330943439,
+        "max": 0.127887376722262
+      }
+    },
+    "random_to_activity_matched": {
+      "endpoint_activity": {
+        "mean": 0.028540721070395944,
+        "sample_sd": 0.07321559168491738,
+        "min": -0.0553668932475518,
+        "max": 0.1767980106753749
+      },
+      "pair_history": {
+        "mean": 0.09280645240467571,
+        "sample_sd": 0.07972224810487409,
+        "min": 0.0102942774622902,
+        "max": 0.2492774952544736
+      },
+      "global_graph": {
+        "mean": 0.003916807258019811,
+        "sample_sd": 0.006569063575385442,
+        "min": -0.0047584635620297,
+        "max": 0.0140094804592029
+      }
+    },
+    "activity_matched_to_activity_matched": {
+      "endpoint_activity": {
+        "mean": 0.18729259366465317,
+        "sample_sd": 0.1357424320680056,
+        "min": 0.0080237818441036,
+        "max": 0.3925028323890303
+      },
+      "pair_history": {
+        "mean": 0.22040773078341871,
+        "sample_sd": 0.11943822003176005,
+        "min": 0.036443244180068,
+        "max": 0.3906546484049774
+      },
+      "global_graph": {
+        "mean": -0.006249211801247599,
+        "sample_sd": 0.015834628522974847,
+        "min": -0.0333704264348735,
+        "max": 0.023693397295216
+      }
+    }
+  },
+  "randomness_accounting": {
+    "injection_seed_variation": [
+      42,
+      43,
+      44
+    ],
+    "m3": "injection-seed variation only; no classifier",
+    "m5_classifier": "random_state equals the frozen run seed; classifier seed is not independently crossed with injection seed",
+    "permutation": "five shuffles per context from permutation seed 31415; shuffles are not independent datasets"
+  }
+}

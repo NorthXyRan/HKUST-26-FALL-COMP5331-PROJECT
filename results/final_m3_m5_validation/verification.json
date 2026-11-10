@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "date_hkt": "2026-11-10",
+  "source_revision": "40d0789b4ad2913532cc7c6a0c8533ae106ed6c9",
+  "environment": {
+    "location": ".venv",
+    "python": "3.11.18",
+    "numpy": "1.26.4",
+    "pandas": "1.5.3",
+    "scikit_learn": "1.6.1",
+    "scipy": "1.17.1",
+    "matplotlib": "3.9.4"
+  },
+  "upstream": {
+    "location": "TGF",
+    "commit": "af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b"
+  },
+  "commands": {
+    "tests": ".venv/bin/python -m unittest discover -s tests -v",
+    "m3": ".venv/bin/python -m src.m3_verify results/m3",
+    "final_m5": ".venv/bin/python -m src.final_m5_verify results/final_m5",
+    "joint": ".venv/bin/python -m src.final_m3_m5 --verify --output results/final_m3_m5"
+  },
+  "tests": {
+    "run": 45,
+    "passed": 45,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 12.679,
+    "upstream_formula_parity_executed": true
+  },
+  "verifiers": {
+    "m3": {
+      "status": "passed",
+      "streams": 18,
+      "anomalies": 57390,
+      "diagnostic_rows": 688680,
+      "input_files": 39,
+      "figures": 7
+    },
+    "final_m5": {
+      "status": "passed",
+      "ablations": 216,
+      "baseline_checks": 324,
+      "baseline_prediction_checks": 54,
+      "permutation_measurements": 810,
+      "inventory_rows": 4284,
+      "mdi_rows": 6426
+    },
+    "joint": {
+      "status": "passed",
+      "joint_rows": 18,
+      "m3_rate_seed_pairs": 9,
+      "m5_ablations": 216,
+      "m5_permutation_measurements": 810,
+      "component_verifiers_checked": true
+    }
+  },
+  "sha256": {
+    "results/m3/manifest.json": "27813056486c406a74f984f29a70e14ca1015d079ef8f0dd5a69d6d856382391",
+    "results/final_m5/manifest.json": "b3fd997faca792195da67df8b6e62ebfbed9915a324c0c40a126942290c83395",
+    "results/final_m3_m5/manifest.json": "b31e3eb070f6e85397d373cdd8f4799a83450139cac07bc8f6c680d603b846a7",
+    "src/final_m3_m5.py": "785dc7cfbcf3dc5523f7cfec39d75e44da059a7c3ee07a400c91460608ea077c",
+    "tests/test_m3_m5_integration.py": "aaf209998fe6a1107c9946f3c94820ce3dfc2e51cef9b6e2b93a3a771a76d04c",
+    "requirements.txt": "4e7750b548482b85361d95f92fa7d0f052e20de42605128d3193e93d136739a5",
+    "configs/m3_environment.txt": "ffbab06e4696092672e5a2c88773ecf0fde71c3f01ccfcc1772f29bec82c5ff6"
+  },
+  "output_sha256": {
+    "REPORT_CN.md": "09fad5a73ff2dcbfa57f6871b05e06f7de9c01193f2c1205471f543ced7425f5"
+  },
+  "randomness_accounting": {
+    "injection_seeds": [42, 43, 44],
+    "classifier_seed_policy": "same numeric seed as the frozen injection run; not independently crossed",
+    "permutation_repeats": 5,
+    "permutation_seed": 31415
+  },
+  "scope": "Project-local environment revalidation only; no model retraining and no frozen artifact overwrite."
+}
