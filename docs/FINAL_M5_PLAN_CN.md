@@ -51,18 +51,16 @@ M5 的目标不是重新选择生成器或修改 M2/M4，而是在冻结的最�
 - 修复冻结产物测试：manifest 的源码哈希属于历史 base revision，不能与后来合并后的当前文件直接比较。
 - 团队确认最终报告使用 `global_graph`，而不是把它误称为 neighborhood。当前模型没有 common-neighbor/Jaccard predictor。
 
-### 尚缺、会限制最终解释的前置实验
+### M3 前置实验更新（2026-11-10）
 
-- M3 正式诊断产物尚不存在。当前只能完成 M5 的模型侧证据，暂时不能完成以下解释：
-  - 正常边、随机异常、匹配异常的完整分布比较；
-  - degree/activity 匹配改善及残余差异；
-  - neighborhood overlap/Jaccard 差异；
-  - prior-pair/repeated-interaction 差异；
-  - temporal burstiness 差异；
-  - 上述诊断在 rate/seed 之间的稳定性。
-- 可选的 pinned TGF checkout 不存在，因此与上游实现逐公式对照的测试会跳过；这不阻塞使用已冻结特征表完成 M5。
+M3 正式诊断已经冻结并通过独立验证，覆盖正常 reference edge、随机异常和活动匹配异常的
+activity/degree、common-neighbor/Jaccard、pair history、recency、concentration、burstiness，
+以及 rate/seed、窗口和历史策略敏感性。M3 与 Final M5 使用完全相同的
+`results/final_m2_m4` 协议和 manifest 哈希，联合证据保存在 `results/final_m3_m5/`。
 
-在 M3 完成前，报告只能写“观察到某组特征影响发生变化”，不能把变化归因于某个生成机制。
+仍需保持两条解释边界：M3 的 common-neighbor/Jaccard 与 burstiness 不是当前分类器的输入列；
+M5 的 `global_graph` 是窗口级全图统计，不能改称 neighborhood 组。联合分析支持机制解释，
+但不能把未进入模型的诊断量说成模型直接依赖的特征。
 
 ## 4. 正式实验矩阵
 
@@ -197,7 +195,9 @@ python -m unittest discover -s tests -v
 
 ### 阶段 E：M3 联合解释
 
-在 M3 产物冻结并核验后，按 rate/seed 对齐诊断和 M5 effect，补充机制解释。若 M3 尚未完成，报告必须保留明确的 pending 标记。
+已按 rate、注入 seed 和 feature set 对齐 M3 主诊断与 M5 AP 消融效应，并新增协议哈希、
+完整矩阵、特征语义和随机性口径测试。结果位于
+[`results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md`](../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md)。
 
 ## 7. 中文报告结构
 
@@ -225,14 +225,22 @@ python -m unittest discover -s tests -v
 - M3 证据已接入，或所有依赖 M3 的结论明确标记为未完成；
 - `git status` 只包含经过审查、计划提交的代码、测试、文档和正式产物。
 
-## 9. 执行结果（2026-11-06）
+## 9. 最终执行结果（更新于 2026-11-10）
 
-阶段 B–D 已完成：
+阶段 B–E 均已完成：
 
-- 31 项测试中 30 项通过，1 项因可选 pinned TGF checkout 不存在而跳过；
+- 完整仓库测试 `45/45` 通过，0 失败、0 跳过；
+- 原先跳过的 pinned TGF 公式对照已使用 commit
+  `af9d575e07c7bc3fd0b4a0b8d0249e7cdd2eb88b` 实际执行并通过；
 - 54 个 full-model 上下文的 test event、时间和标签逐行一致，预测漂移审计通过；
 - 216 条 retrained ablation、810 条 grouped permutation、6,426 条 MDI 记录完整；
-- 多 seed 配对汇总、图片、中文报告和 manifest 已生成；
-- 独立 verifier 已通过所有输入/源码/输出哈希、计数和数值关系检查。
+- M3 的 18 条流、57,390 个异常、688,680 行诊断和 7 张图通过独立 verifier；
+- M3 与 Final M5 的公共协议/manifest 哈希一致，18 行 rate/seed/feature-set 联合证据完整；
+- M3、Final M5、联合包三个独立 verifier 全部通过。
 
-正式报告位于 [`results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)。阶段 E 仍受 M3 diagnostics 前置依赖限制；报告已将 neighborhood、prior-pair residual、degree residual 和 burstiness 的机制归因明确标记为 pending。
+正式 M5 报告位于
+[`results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)，联合解释位于
+[`results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md`](../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md)，
+完整测试清单与“项目是否完成”的边界见
+[`M5_TEST_COMPLETION_CN.md`](M5_TEST_COMPLETION_CN.md)。Final M5 已满足本计划的完成定义；
+整个课程项目仍需完成 M6 最终报告与 M7 展示材料。

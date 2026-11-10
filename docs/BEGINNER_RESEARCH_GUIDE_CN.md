@@ -236,17 +236,21 @@ R→M 明显低于 R→R，说明在随机异常上学到的模型不能很好�
 3. 面对活动匹配异常时，两节点过去的交互历史变得更重要；
 4. 用 matched 数据重新训练后，模型会同时利用端点活跃度和 pair history。
 
-## 8. 目前还没有完成什么
+## 8. M3 更新后，我们又知道了什么
 
-M3 的完整 generator diagnostics 还没有冻结。我们仍需直接比较正常边、随机异常和活动匹配异常的：
+M3 的 generator diagnostics 已经冻结并通过验证。它直接比较正常 reference edge、随机异常和
+活动匹配异常，还检查了不同注入率、seed、历史窗口与历史更新策略。
 
-- 度数和活动量分布；
-- 邻居重叠或结构接近程度；
-- 过去重复交互的残余差异；
-- 时间上的集中或突发程度（burstiness）；
-- 以上差异在不同注入率和随机种子下是否稳定。
+最直观的结果是：活动匹配在九个 rate/seed 配置中都有效，端点活动误差平均降低约 `56.37%`。
+匹配异常与正常边之间的度数、共同邻居、Jaccard、最近出现时间和已定义样本的 burstiness 差异也变小。
 
-因此，目前可以说“模型对某组特征的依赖发生了变化”，但不能仅凭 M5 就断言“某个具体生成机制导致了全部性能下降”。M5 提供的是模型侧关联证据，不是完整的因果证明。
+但匹配并不完美。两种异常生成器都要求异常边是“过去从没出现过的新边”，所以异常的历史
+pair count 全是 0，而正常 reference edge 往往重复出现。这个残差与 M5 的结果相互印证：
+活动匹配削弱 endpoint-activity 捷径后，pair history 在 R→M 和 M→M 中变得更重要。
+
+仍需注意，这不是完整因果证明。M3 的共同邻居、Jaccard 和 burstiness 不是当前分类器的输入列；
+M5 的 `global_graph` 也是全图统计组，不是邻域特征组。当前尚未完成的主要是 M6 最终报告整合、
+M7 展示材料，以及可选的更多数据集、分类器和独立 classifier-seed 交叉实验。
 
 ## 9. 这项研究真正想说明什么
 
@@ -283,4 +287,6 @@ validation 像正式考试前的模拟卷，用于选择参数和判断阈值；
 1. 先阅读本文件，理解研究问题和整体流程；
 2. 阅读 [`PROJECT_RESEARCH_OVERVIEW_CN.md`](PROJECT_RESEARCH_OVERVIEW_CN.md)，了解更紧凑的技术概览；
 3. 阅读 [`FINAL_M5_PLAN_CN.md`](FINAL_M5_PLAN_CN.md)，了解正式实验如何设计和验收；
-4. 阅读 [`../results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)，查看完整 M5 数值结果。
+4. 阅读 [`../results/m3/REPORT.md`](../results/m3/REPORT.md)，查看生成器诊断；
+5. 阅读 [`../results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)，查看完整 M5 数值结果；
+6. 阅读 [`../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md`](../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md)，查看联合解释、随机性口径和限制。

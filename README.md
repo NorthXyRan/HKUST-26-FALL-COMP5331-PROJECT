@@ -33,15 +33,15 @@ All dates are in **2026**. All times are in **Hong Kong time (HKT, UTC+8)**.
 
 The dates below are internal targets in **2026 (HKT)**. The official deadlines remain those listed above. The core study uses **UCI Messages, two anomaly generators, TGF features, and three train/test settings**.
 
-The final M2/M4 controlled protocol and repeated-seed runs are recorded in the canonical package above. M3 interpretation, M5 ablations, and the final report remain separate work.
+The final M2/M4 controlled protocol, M3 diagnostics, Final M5 ablations, and their strict-protocol integration are now recorded in the repository. M6 report assembly and M7 presentation work remain.
 
 | Milestone | Target | Completion criteria |
 | --- | --- | --- |
 | ~~**M1: Reproduce the TGF baseline**~~ | ~~**16 October**~~ | ~~Run the official TGF pipeline with random injection on UCI Messages. Compare with the published results for the corresponding settings and investigate discrepancies. Record the data/code versions, preprocessing, history configuration, classifier settings, anomaly proportion, seeds, and reproduction command.~~ |
 | **M2: Implement controlled injection** | **23 October** | ~~Provide random and activity-matched generators through a common interface.~~ Final protocol: validation-selected window/bin settings, aligned eligibility/history, independent strict pre-timestamp feature extraction, and frozen data/configuration in `results/final_m2_m4/`. |
-| **M3: Validate generator matching** | **27 October** | Compare normal edges, random anomalies, and matched anomalies using distribution plots and diagnostic statistics. Verify that endpoint-activity discrepancies shrink; report residual differences in degree, neighborhood structure, pair history, and temporal burstiness. If matching is ineffective, revise M2 before proceeding. |
+| ~~**M3: Validate generator matching**~~ | ~~**27 October**~~ | ~~Compare normal edges, random anomalies, and matched anomalies using distribution plots and diagnostic statistics.~~ Completed on the frozen strict protocol with three windows, two history policies, three rates, three seeds, residual structure/timing diagnostics, hashes, and an independent verifier in `results/m3/`. |
 | **M4: Complete the main comparison** | **2 November** | ~~Run **random -> random**, **random -> matched**, and **matched -> matched** at 1%, 5%, and 10% injection with seed 42; keep the split, feature definitions, classifier, and evaluation rules consistent; pair timestamps; report PR-AUC, ROC-AUC, recall at 1% FPR, and performance deltas.~~ Final controlled comparison repeats seeds 42–44 with validation-calibrated thresholds, actual test FPR, paired deltas, and variability in `results/final_m2_m4/`. |
-| **M5: Explain the feature-level effects** | **6 November** | Define and ablate the endpoint-activity, pair-history, and neighborhood feature groups, retraining each model. Combine ablation and feature-importance evidence with M3 diagnostics to explain performance changes. Use M4 to assess how much matched-condition retraining recovers performance; limit conclusions to the tested features and classifier. |
+| ~~**M5: Explain the feature-level effects**~~ | ~~**6 November**~~ | Completed 216 retrained ablations, 810 grouped-permutation measurements, 6,426 MDI rows, M4 drift audits, and M3–M5 joint checks. The actual third group is `global_graph`, not a neighborhood feature group; conclusions remain limited to the tested features and classifier. |
 | **M6: Finalize the report and reproducibility package** | **12 November** | Answer RQ1-RQ3 with the main results, diagnostics, ablations, uncertainty, and limitations. Include code attribution, configurations, seeds, and runnable instructions. Ensure every reported result is traceable to a saved run. Finish the report for submission by **13 November, 13:30**. |
 | **M7: Prepare the presentation** | **26 November** | Finish the slides and source-code package, assign speaking sections to all six members, and rehearse within the presentation limits below. Submit the presentation order form, slides, and source code before the assigned session on **29 November, 09:00-10:30**. |
 
@@ -111,7 +111,24 @@ train/validation selection requirements above are not fully satisfied yet.
 3. **Q&A:** Prepare to answer questions from students and the instructor.
 4. **Questions for another group:** Each member must ask at least one question during the assigned slot.
 
-## M5 local feature analysis
+## Final M5 feature analysis
 
-See [docs/M5.md](docs/M5.md) for feature definitions, reproducible ablation and
-importance commands, saved result locations, and the next team decisions.
+See the [Final M5 plan](docs/FINAL_M5_PLAN_CN.md), [M5 result report](results/final_m5/FINAL_M5_REPORT_CN.md),
+[M3–M5 joint report](results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md), and
+[test completion report](docs/M5_TEST_COMPLETION_CN.md). The older
+[docs/M5.md](docs/M5.md) and `results/m5/` preserve the seed-42 prototype only.
+
+## M3 generator diagnostics
+
+The strict-protocol M3 analysis is available in [docs/M3.md](docs/M3.md), with
+[results and seven figures](results/m3/REPORT.md). It covers 18 streams, three
+diagnostic windows, observed/common-benign histories, interval burstiness, paired
+activity effects and residual structure. Two-member ownership is recorded in the
+handoff. Run `python -m src.m3 --output results/m3_reproduced`, then
+`python -m src.m3_verify results/m3_reproduced`.
+
+M3 and Final M5 both use the same hashed `results/final_m2_m4` package. Their
+protocol alignment, rate/seed matrix, feature semantics, and randomness accounting
+are checked by `src.final_m3_m5`; machine-readable joint evidence is saved under
+[`results/final_m3_m5/`](results/final_m3_m5/). Legacy `results/full_pipeline` and
+`results/m5` artifacts are not mixed into the final claims.

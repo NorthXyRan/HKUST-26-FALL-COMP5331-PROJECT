@@ -1,0 +1,41 @@
+test_all_saved_file_and_source_hashes (test_final_artifacts.FrozenArtifactTests.test_all_saved_file_and_source_hashes) ... ok
+test_feature_metadata_and_split_membership (test_final_artifacts.FrozenArtifactTests.test_feature_metadata_and_split_membership) ... ok
+test_metrics_recompute_and_thresholds_are_shared (test_final_artifacts.FrozenArtifactTests.test_metrics_recompute_and_thresholds_are_shared) ... ok
+test_stream_constraints_timestamps_and_reference_alignment (test_final_artifacts.FrozenArtifactTests.test_stream_constraints_timestamps_and_reference_alignment) ... ok
+test_both_conditions_share_constraints_and_are_reproducible (test_final_pipeline.ProtocolTests.test_both_conditions_share_constraints_and_are_reproducible) ... ok
+test_schedule_paired_exact_and_no_early_injection (test_final_pipeline.ProtocolTests.test_schedule_paired_exact_and_no_early_injection) ... ok
+test_split_keeps_timestamp_ties_together (test_final_pipeline.ProtocolTests.test_split_keeps_timestamp_ties_together) ... ok
+test_test_labels_do_not_select_threshold_or_scores (test_final_pipeline.ProtocolTests.test_test_labels_do_not_select_threshold_or_scores) ... ok
+test_threshold_handles_ties_within_validation_budget (test_final_pipeline.ProtocolTests.test_threshold_handles_ties_within_validation_budget) ... ok
+test_current_and_simultaneous_events_cannot_change_features (test_final_pipeline.StrictFeaturesTests.test_current_and_simultaneous_events_cannot_change_features) ... ok
+test_even_distributions_use_upstream_lower_median (test_final_pipeline.StrictFeaturesTests.test_even_distributions_use_upstream_lower_median) ... ok
+test_feature_formulas_match_upstream_on_identical_history (test_final_pipeline.StrictFeaturesTests.test_feature_formulas_match_upstream_on_identical_history) ... skipped 'optional pinned TGF checkout unavailable'
+test_sliding_graph_matches_bruteforce (test_final_pipeline.StrictFeaturesTests.test_sliding_graph_matches_bruteforce) ... ok
+test_unseen_endpoints_and_empty_history (test_final_pipeline.StrictFeaturesTests.test_unseen_endpoints_and_empty_history) ... ok
+test_activity_matched_strategy_is_available (test_generators.GeneratorTests.test_activity_matched_strategy_is_available) ... ok
+test_activity_window_index_slides_and_enforces_strict_time (test_generators.GeneratorTests.test_activity_window_index_slides_and_enforces_strict_time) ... ok
+test_incremental_history_index_is_strict_and_seeded (test_generators.GeneratorTests.test_incremental_history_index_is_strict_and_seeded) ... ok
+test_no_coverage_is_reported_not_random_fallback (test_generators.GeneratorTests.test_no_coverage_is_reported_not_random_fallback) ... ok
+test_random_is_seeded_novel_and_non_loop (test_generators.GeneratorTests.test_random_is_seeded_novel_and_non_loop) ... ok
+test_rank_pool_generator_returns_requested_unique_novel_edges (test_generators.GeneratorTests.test_rank_pool_generator_returns_requested_unique_novel_edges) ... ok
+test_same_timestamp_and_future_edges_are_invisible (test_generators.GeneratorTests.test_same_timestamp_and_future_edges_are_invisible) ... ok
+test_activity_alignment_is_undirected (test_m3.HistoryTests.test_activity_alignment_is_undirected) ... ok
+test_batch_order_and_history_eviction (test_m3.HistoryTests.test_batch_order_and_history_eviction) ... ok
+test_burstiness_regular_irregular_and_missing (test_m3.HistoryTests.test_burstiness_regular_irregular_and_missing) ... ok
+test_equal_timestamp_queries_do_not_see_current_events (test_m3.HistoryTests.test_equal_timestamp_queries_do_not_see_current_events) ... ok
+test_time_window_boundary_and_unseen (test_m3.HistoryTests.test_time_window_boundary_and_unseen) ... ok
+test_window_matches_bruteforce (test_m3.HistoryTests.test_window_matches_bruteforce) ... ok
+test_replay_aligns_and_rejects_bad_audits (test_m3.PipelineTests.test_replay_aligns_and_rejects_bad_audits) ... ok
+test_summary_retains_missingness_and_seed_pairing (test_m3.PipelineTests.test_summary_retains_missingness_and_seed_pairing) ... /Users/gyy/Documents/Codex/2026-11-06/https-github-com-northxyran-hkust-26-2/work/m3-venv/lib/python3.11/site-packages/scipy/stats/_continuous_distns.py:271: RuntimeWarning: divide by zero encountered in divide
+  return (0.5/(n if not isinstance(n, Iterable) else np.asanyarray(n)),
+ok
+test_tampered_input_is_rejected (test_m3.PipelineTests.test_tampered_input_is_rejected) ... ok
+test_complete_nonoverlapping_multihorizon_groups_exclude_label (test_m5.M5Tests.test_complete_nonoverlapping_multihorizon_groups_exclude_label) ... ok
+test_group_permutation_keeps_duplicate_columns_paired_and_input_unchanged (test_m5.M5Tests.test_group_permutation_keeps_duplicate_columns_paired_and_input_unchanged) ... ok
+test_shared_modeling_preserves_original_m4_training (test_m5.M5Tests.test_shared_modeling_preserves_original_m4_training) ... ok
+test_split_uses_m4_rounding_and_keeps_order (test_m5.M5Tests.test_split_uses_m4_rounding_and_keeps_order) ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 7.202s
+
+OK (skipped=1)

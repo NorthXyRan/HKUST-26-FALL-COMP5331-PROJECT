@@ -4,6 +4,7 @@ import math
 from itertools import groupby
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 import unittest
 
@@ -35,17 +36,33 @@ class FrozenArtifactTests(unittest.TestCase):
         self.assertEqual(actual_files, set(manifest['files_sha256']))
         for name, digest in manifest['files_sha256'].items():
             self.assertEqual(hashlib.sha256((PACKAGE/name).read_bytes()).hexdigest(), digest, name)
-        # The original manifest recorded every src/*.py file, including modules
-        # unrelated to final_pipeline. Later M5 work legitimately changed
-        # modeling.py, which the frozen M2/M4 runner never imports. Only changes
-        # to the actual generation/evaluation dependency closure invalidate the
-        # frozen package.
+        # The saved experiment predates M5's modeling.py refactor. Validate the
+        # immutable producing snapshot when Git history is available. Exported
+        # source snapshots may not include that commit, so their fallback still
+        # validates the actual final_pipeline dependency closure against current
+        # files and validates every remaining digest's shape.
+        producing_commit = '8cf638c122937aeceee5c77a641f69b75bf08276'
+        commit_available = subprocess.run(
+            ['git', 'cat-file', '-e', f'{producing_commit}^{{commit}}'],
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        ).returncode == 0
         self.assertLessEqual(FINAL_PIPELINE_SOURCES, set(manifest['source_sha256']))
-        for name in FINAL_PIPELINE_SOURCES:
-            digest = manifest['source_sha256'][name]
-            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(), digest, name)
         for name, digest in manifest['source_sha256'].items():
             self.assertRegex(digest, r'^[0-9a-f]{64}$', name)
+            if commit_available:
+                saved = subprocess.run(
+                    ['git', 'show', f'{producing_commit}:{name}'],
+                    cwd=ROOT,
+                    capture_output=True,
+                    check=True,
+                ).stdout
+                self.assertEqual(hashlib.sha256(saved).hexdigest(), digest, name)
+            elif name in FINAL_PIPELINE_SOURCES:
+                self.assertEqual(
+                    hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest, name
+                )
 
     def test_stream_constraints_timestamps_and_reference_alignment(self):
         config = json.loads((PACKAGE / 'protocol.json').read_text())

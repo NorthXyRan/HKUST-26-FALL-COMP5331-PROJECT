@@ -1,6 +1,10 @@
 # Final M5 阶段 A：基线测试报告
 
-> 本文件保留阶段 A 的历史快照。Final M5 后续实验现已完成，正式结论和产物请见 [`results/final_m5/FINAL_M5_REPORT_CN.md`](../results/final_m5/FINAL_M5_REPORT_CN.md)。
+> 本文件保留 2026-11-06 阶段 A 的历史快照。2026-11-10 的当前状态是 45/45 测试通过、
+> 无失败或跳过，M3/Final M5/联合 verifier 全部通过。请以
+> [`M5_TEST_COMPLETION_CN.md`](M5_TEST_COMPLETION_CN.md) 和
+> [`results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md`](../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md)
+> 为当前结论。
 
 日期：2026 年 11 月 6 日  
 分支：`final-m5`  
@@ -90,9 +94,11 @@ python -m unittest discover -s tests -v
 
 这些是执行计划的阶段 B–D，不应被当前“全套旧测试通过”替代。
 
-## 6. 受前置实验限制的部分
+## 6. 当时受前置实验限制的部分（现已解除）
 
-M3 正式诊断尚未完成，因此即使 M5 模型实验完成，也暂时只能报告特征组与性能的关联，不能完成 neighborhood、pair repetition、burstiness 等机制归因。相关结论必须等待 M3 产物，或在报告中明确标为 pending。
+阶段 A 当时尚无 M3 正式诊断。现在 M3 已完成并与 strict Final M5 按公共协议哈希、rate/seed
+和 feature set 对齐；联合结果支持 endpoint-activity 捷径削弱与 pair-history 残差解释。
+common-neighbor/Jaccard/burstiness 仍不是当前分类器输入，因而继续保留非因果解释边界。
 
 ## 7. 当前判断
 

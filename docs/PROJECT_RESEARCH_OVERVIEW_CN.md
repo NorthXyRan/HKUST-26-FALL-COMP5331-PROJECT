@@ -84,7 +84,25 @@ Random Forest 可以理解为 100 棵决策树投票。每棵树会学习类似�
 
 combined-H 通常优于只用 H1000，说明短期与长期历史信号存在互补。不过这些结果还不能单独证明性能下降完全由 endpoint activity 引起，因为 matched 与 random 之间还可能存在 neighborhood、pair repetition 和 temporal burstiness 等残余差异。
 
-## 6. M5 进一步回答了什么
+## 6. M3 诊断进一步发现了什么
+
+M3 在同一个冻结协议上重放 18 条流，并分别检查 test split、observed history、1,000-event
+window 的预先声明主分析。活动匹配在全部 9 个 rate/seed 配置中都有效：端点 activity error
+平均降低 `56.37%`，范围为 `53.72%–59.87%`。
+
+与对应正常 reference edge 比较时，平均 KS 距离也下降：
+
+- degree mean：`0.8545 → 0.4170`；
+- common neighbors：`0.1255 → 0.0713`；
+- Jaccard：`0.1255 → 0.0771`；
+- recency：`0.8440 → 0.5308`；
+- 对已有定义样本的 burstiness：`0.1926 → 0.0732`。
+
+但是 pair count 的 KS 几乎不变（约 `0.8332 → 0.8350`）。原因很直观：两种人工异常都必须是
+历史上从未出现的新边，所以异常的历史 pair count 全为 0；正常 reference edge 往往重复出现。
+这说明 activity matching 消除了一个明显捷径，却没有让异常在所有方面都与正常边相同。
+
+## 7. M5 进一步回答了什么
 
 M5 分别删除 endpoint activity、pair history、global graph 特征组并重新训练，再与 grouped permutation importance 对照。正式实验覆盖三种注入率、三个 seed、两个特征集合和三种训练—测试设置，共得到 216 条消融结果和 810 次联合置换测量。
 
@@ -98,17 +116,21 @@ M5 分别删除 endpoint activity、pair history、global graph 特征组并重�
 
 消融不是简单把训练好的模型某列清零，而是删除整组特征后重新训练，因此可以观察剩余特征能否替代被删除的信息。Permutation importance 则固定完整模型，只打乱某一组，用于观察现有模型对该组的依赖。两者回答的问题不同，结果不必完全一致。
 
-## 7. 当前研究进度
+## 8. 当前研究进度
 
 - **M1**：TGF baseline reproduction 已完成。
 - **M2**：random/activity-matched controlled injection 与严格历史规则已冻结。
 - **M4**：三注入率、三 seed、两特征集、三设置的最终比较已完成。
-- **M3**：完整分布诊断、neighborhood、pair-history residual 和 burstiness 解释尚未完成。
+- **M3**：完整分布诊断、neighborhood、pair-history residual、burstiness、窗口/历史敏感性和独立校验已完成。
 - **M5**：最终多 seed 消融、联合置换、MDI、漂移审计、中文报告和独立校验已完成。
+- **M3–M5 联合测试**：协议/manifest 哈希、rate/seed 矩阵、特征语义、随机性口径和 18 行联合证据均已验证。
 
-M3 仍是当前主要前置依赖。M5 证明的是模型对特征组的依赖关系，不能单独说明生成器为什么改变了 neighborhood overlap、重复交互或 temporal burstiness；这些机制解释仍需 M3 diagnostics。
+联合结果表明：R→R 的高分很依赖 endpoint activity；匹配削弱这个捷径后，R→M 的 endpoint
+依赖明显下降，而未消除的“新边”约束使 pair-history 在 R→M 和 M→M 中更重要。完整数值与
+边界见 [`results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md`](../results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md)。
+项目接下来是 M6 最终报告整合与 M7 展示，而不是继续把未进入模型的诊断特征解释成因果证据。
 
-## 8. 研究贡献可以怎样概括
+## 9. 研究贡献可以怎样概括
 
 当前项目的主要贡献不是提出一个更复杂的分类器，而是建立一个更公平、可审计的异常检测评估流程：
 
