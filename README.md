@@ -115,7 +115,8 @@ train/validation selection requirements above are not fully satisfied yet.
 
 See the [Final M5 plan](docs/FINAL_M5_PLAN_CN.md), [M5 result report](results/final_m5/FINAL_M5_REPORT_CN.md),
 [M3–M5 joint report](results/final_m3_m5/FINAL_M3_M5_REPORT_CN.md), and
-[test completion report](docs/M5_TEST_COMPLETION_CN.md). The older
+[test completion report](docs/M5_TEST_COMPLETION_CN.md). The project-local environment
+revalidation is recorded in [`results/final_m3_m5_validation/`](results/final_m3_m5_validation/). The older
 [docs/M5.md](docs/M5.md) and `results/m5/` preserve the seed-42 prototype only.
 
 ## M3 generator diagnostics

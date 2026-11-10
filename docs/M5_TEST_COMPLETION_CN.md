@@ -130,5 +130,8 @@ component_verifiers_checked=true
 4. 新分析必须写入新的 `results/<milestone>/` 目录；生成器 seed、分类器 seed 与 permutation
    repeats 必须分别报告。
 
-本次机器的主目录磁盘已满，因此锁定环境和被忽略的 TGF checkout 临时放在 `/tmp`；这不影响
-仓库产物，也不是项目运行时的代码依赖。其他环境可按 README 正常建立 `.venv` 和本地 `TGF/`。
+首次复验时主目录空间不足，因此锁定环境和 TGF checkout 临时放在 `/tmp`。空间释放后，已经
+按 README 在项目根目录建立 `.venv/` 和 `TGF/`，再次得到 `45/45` 通过、0 跳过，并通过三个
+verifier。项目内复验的机器可读记录见
+[`results/final_m3_m5_validation/`](../results/final_m3_m5_validation/)。`.venv/` 和 `TGF/` 均被
+`.gitignore` 排除，不会进入提交，也不会改变冻结结果。
